@@ -25,10 +25,6 @@ public class MainActivity extends Activity{
     public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
     static final int CONTACT_REQUEST = 1;  // The request code
     static ArrayList<String> shop_list;
-    GeLoBeaconManager ml;
-    ArrayList<GeLoBeacon> beacons;
-    Vibrator v;
-    int minRssi = -100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,13 +32,11 @@ public class MainActivity extends Activity{
         final String TAG = MainActivity.class.getSimpleName();
         setContentView(R.layout.activity_main);
         shop_list = new ArrayList<String>();
-        String[] values = new String[] { "Bananas", "Milk", "WindowsMobile",
-                "Blackberry"};
+        String[] values = new String[] { "Bananas", "Milk", "Eggs"};
         for (int i = 0; i < values.length; ++i) {
             shop_list.add(values[i]);
         }
         Log.d(TAG, "Creating Layout");
-        v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     @Override
@@ -70,8 +64,8 @@ public class MainActivity extends Activity{
     }
 
     /** Called when the user clicks the create List button */
-    public void shop(View view) {
-        Intent intent = new Intent(this, ListActivity.class);
+    public void startShop(View view) {
+        Intent intent = new Intent(this, ShopActivity.class);
         intent.putStringArrayListExtra(EXTRA_MESSAGE, shop_list);
         startActivityForResult(intent, CONTACT_REQUEST);
     }
@@ -95,29 +89,5 @@ public class MainActivity extends Activity{
         return super.onOptionsItemSelected(item);
     }
 
-    class UpdateBeacon extends TimerTask {
-        @Override
-        public void run() {
-            MainActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    beacons = ml.getKnownBeacons();
-                    int rssi = 0;
-                    if (beacons.isEmpty() != true) {
-                        for (GeLoBeacon i : beacons) {
-                            if (i.getBeaconId() == 551) {
-                                rssi = i.getSignalStregth();
-                            }
-                        }
-                    }
-                    if (minRssi < rssi) {
-                        minRssi = rssi;
-                        v.vibrate(400);
-                    }
-                    TextView rssiView = (TextView)findViewById(R.id.rssiLabel);
-                    rssiView.setText(Integer.toString(rssi));
-                }
-            });
-        }
-    }
+
 }

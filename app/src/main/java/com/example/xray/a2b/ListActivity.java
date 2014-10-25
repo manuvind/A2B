@@ -28,9 +28,10 @@ public class ListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
-        Intent intent = getIntent();
 
+        Intent intent = getIntent();
         list = intent.getStringArrayListExtra(MainActivity.EXTRA_MESSAGE);
+
         final ListView listview = (ListView) findViewById(R.id.listview);
         adapter = new ArrayAdapter(this,
                 android.R.layout.simple_list_item_1, list);
