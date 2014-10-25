@@ -23,6 +23,7 @@ public class MainActivity extends Activity {
     Vibrator v;
     int minRssi = -100;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +31,7 @@ public class MainActivity extends Activity {
         ml = GeLoBeaconManager.sharedInstance(getApplicationContext());
         ml.startScanningForBeacons();
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new UpdateBeacon(), 0, 1*400);
+        timer.scheduleAtFixedRate(new UpdateBeacon(), 0, 2*400);
         v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
@@ -69,10 +70,19 @@ public class MainActivity extends Activity {
                             }
                         }
                     }
-                    if (minRssi < rssi) {
-                        minRssi = rssi;
-                        v.vibrate(400);
+                    if (rssi != 0) {
+                        if (minRssi < rssi) {
+                            minRssi = rssi;
+                            v.vibrate(400);
+                            TextView rssiText = (TextView)findViewById(R.id.textView);
+                            rssiText.setText(Integer.toString(minRssi));
+                        }
                     }
+                    //near
+                    int near = 0;
+                    TextView rView = (TextView)findViewById(R.id.near);
+                    rView.setText(Integer.toString(near));
+
                     TextView rssiView = (TextView)findViewById(R.id.rssiLabel);
                     rssiView.setText(Integer.toString(rssi));
                 }
