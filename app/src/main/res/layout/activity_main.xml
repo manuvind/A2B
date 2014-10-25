@@ -32,4 +32,22 @@
         android:layout_below="@+id/textView"
         android:layout_alignStart="@+id/textView" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reset"
+        android:id="@+id/button"
+        android:onClick="resetBeacons"
+        android:layout_below="@+id/near"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Button"
+        android:id="@+id/button2"
+        android:onClick="installToq"
+        android:layout_below="@+id/button"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>
