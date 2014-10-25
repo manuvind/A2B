@@ -1,10 +1,12 @@
 package com.example.xray.a2b;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.os.Vibrator;
 
 import com.gelo.gelosdk.GeLoBeaconManager;
 import com.gelo.gelosdk.Model.Beacons.GeLoBeacon;
@@ -18,6 +20,8 @@ public class MainActivity extends Activity {
 
     GeLoBeaconManager ml;
     ArrayList<GeLoBeacon> beacons;
+    Vibrator v;
+    int minRssi = -100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +31,7 @@ public class MainActivity extends Activity {
         ml.startScanningForBeacons();
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new UpdateBeacon(), 0, 1*400);
+        v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
 
@@ -63,6 +68,10 @@ public class MainActivity extends Activity {
                                 rssi = i.getSignalStregth();
                             }
                         }
+                    }
+                    if (minRssi < rssi) {
+                        minRssi = rssi;
+                        v.vibrate(400);
                     }
                     TextView rssiView = (TextView)findViewById(R.id.rssiLabel);
                     rssiView.setText(Integer.toString(rssi));
