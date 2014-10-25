@@ -22,6 +22,8 @@ public class MainActivity extends Activity {
     ArrayList<GeLoBeacon> beacons;
     Vibrator v;
     int minRssi = -100;
+    ArrayList<Integer> visited = new ArrayList<Integer>();
+    int bChoice = 0;
 
 
     @Override
@@ -55,6 +57,44 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void currProximity(ArrayList<GeLoBeacon> kBeacons) {
+        if (bChoice == 0) {
+            chooseNearest(kBeacons);
+        }
+        for (GeLoBeacon i : kBeacons) {
+            if (i.getBeaconId() == bChoice) {
+                int rssi = i.getSignalStregth();
+                if (minRssi < rssi) {
+                    minRssi = rssi;
+                    v.vibrate(400);
+                    TextView rssiText = (TextView)findViewById(R.id.textView);
+                    rssiText.setText(Integer.toString(minRssi));
+                }
+
+                if (minRssi > -58) {
+                    visited.add(i.getBeaconId());
+                    chooseNearest(kBeacons);
+                }
+            }
+        }
+
+    }
+
+    public void chooseNearest(ArrayList<GeLoBeacon> kBeacons) {
+        int max = -100;
+        int curr_id = 0;
+        for (GeLoBeacon i : kBeacons) {
+            if (!visited.contains(i.getBeaconId())) {
+                if (i.getSignalStregth() > max) {
+                    max = i.getSignalStregth();
+                    curr_id = i.getBeaconId();
+                }
+            }
+        }
+        minRssi = max;
+        bChoice = curr_id;
+    }
+
     class UpdateBeacon extends TimerTask {
         @Override
         public void run() {
@@ -63,25 +103,33 @@ public class MainActivity extends Activity {
                 public void run() {
                     beacons = ml.getKnownBeacons();
                     int rssi = 0;
+                    boolean notZero = true;
                     if (beacons.isEmpty() != true) {
                         for (GeLoBeacon i : beacons) {
-                            if (i.getBeaconId() == 551) {
-                                rssi = i.getSignalStregth();
+                            if (i.getSignalStregth() == 0) {
+                                notZero = false;
                             }
                         }
                     }
-                    if (rssi != 0) {
-                        if (minRssi < rssi) {
-                            minRssi = rssi;
-                            v.vibrate(400);
-                            TextView rssiText = (TextView)findViewById(R.id.textView);
-                            rssiText.setText(Integer.toString(minRssi));
-                        }
-                    }
-                    //near
-                    int near = 0;
                     TextView rView = (TextView)findViewById(R.id.near);
-                    rView.setText(Integer.toString(near));
+                    if (notZero) {
+                        if (visited.size() < 3) {
+                            currProximity(beacons);
+                        } else {
+                            rView.setText("found all beacons");
+                        }
+
+                    }
+//                    if (rssi != 0) {
+//                        if (minRssi < rssi) {
+//                            minRssi = rssi;
+//                            v.vibrate(400);
+//                            TextView rssiText = (TextView)findViewById(R.id.textView);
+//                            rssiText.setText(Integer.toString(minRssi));
+//                        }
+//                    }
+                    //near
+                    rView.setText(Integer.toString(bChoice));
 
                     TextView rssiView = (TextView)findViewById(R.id.rssiLabel);
                     rssiView.setText(Integer.toString(rssi));
