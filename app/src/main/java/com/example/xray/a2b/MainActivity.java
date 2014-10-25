@@ -307,8 +307,8 @@ public class MainActivity extends Activity {
 
                 if (minRssi > -58) {
                     visited.add(i.getBeaconId());
-                    chooseNearest(kBeacons);
                     sendNotification(bChoice);
+                    chooseNearest(kBeacons);
                 }
             }
         }
