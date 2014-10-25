@@ -4,14 +4,29 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import com.gelo.gelosdk.GeLoBeaconManager;
+import com.gelo.gelosdk.Model.Beacons.GeLoBeacon;
+
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class MainActivity extends Activity {
+
+    GeLoBeaconManager ml;
+    ArrayList<GeLoBeacon> beacons;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ml = GeLoBeaconManager.sharedInstance(getApplicationContext());
+        ml.startScanningForBeacons();
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new UpdateBeacon(), 0, 1*400);
     }
 
 
@@ -32,5 +47,27 @@ public class MainActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    class UpdateBeacon extends TimerTask {
+        @Override
+        public void run() {
+            MainActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    beacons = ml.getKnownBeacons();
+                    int rssi = 0;
+                    if (beacons.isEmpty() != true) {
+                        for (GeLoBeacon i : beacons) {
+                            if (i.getBeaconId() == 551) {
+                                rssi = i.getSignalStregth();
+                            }
+                        }
+                    }
+                    TextView rssiView = (TextView)findViewById(R.id.rssiLabel);
+                    rssiView.setText(Integer.toString(rssi));
+                }
+            });
+        }
     }
 }

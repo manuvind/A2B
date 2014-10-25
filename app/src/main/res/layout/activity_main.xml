@@ -9,8 +9,11 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:text="@string/hello_world"
+        android:id="@+id/rssiLabel"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="14dp"
+        android:gravity="center"
+        android:text="RSSI Label" />
 
 </RelativeLayout>
