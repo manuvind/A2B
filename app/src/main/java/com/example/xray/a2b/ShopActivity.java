@@ -7,14 +7,18 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Vibrator;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +26,9 @@ import android.widget.Toast;
 
 import com.gelo.gelosdk.GeLoBeaconManager;
 import com.gelo.gelosdk.Model.Beacons.GeLoBeacon;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
 import com.qualcomm.toq.smartwatch.api.v1.deckofcards.Constants;
 import com.qualcomm.toq.smartwatch.api.v1.deckofcards.DeckOfCardsEventListener;
 import com.qualcomm.toq.smartwatch.api.v1.deckofcards.card.ListCard;
@@ -36,6 +43,10 @@ import com.qualcomm.toq.smartwatch.api.v1.deckofcards.resource.CardImage;
 import com.qualcomm.toq.smartwatch.api.v1.deckofcards.resource.DeckOfCardsLauncherIcon;
 import com.qualcomm.toq.smartwatch.api.v1.deckofcards.util.ParcelableUtil;
 
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,6 +63,8 @@ public class ShopActivity extends Activity {
     int minRssi = -100;
     ArrayList<Integer> visited = new ArrayList<Integer>();
     int bChoice = 0;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+
 
     private static HashMap<String, Integer> foodMap = new HashMap<String, Integer>();
     private static ArrayList<String> shop_list;
@@ -350,6 +363,7 @@ public class ShopActivity extends Activity {
                     String foundItem = shop_list.remove(0);
                     adapter.notifyDataSetChanged();
                     sendNotification(bChoice,foundItem);
+                    ocrImage();
                     chooseNearest(kBeacons);
                 }
             }
@@ -372,8 +386,86 @@ public class ShopActivity extends Activity {
         bChoice = curr_id;
     }
 
+    public void ocrImage() {
+        dispatchTakePictureIntent();
+    }
+
     public void resetBeacons(View view) {
         visited.clear();
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            ImageView imageView = (ImageView) findViewById(R.id.imageView);
+            imageView.setImageBitmap(imageBitmap);
+            processPictureWhenReady(imageBitmap);
+        }
+    }
+
+    public void toastResult(String result){
+        Toast.makeText(getApplicationContext(), result,
+                Toast.LENGTH_LONG).show();
+    }
+
+    private static class IODOCRTask extends AsyncTask<File,Void,String> {
+        private ShopActivity activity;
+        protected IODOCRTask(ShopActivity activity) {
+            this.activity = activity;
+        }
+        @Override
+        protected String doInBackground(File... params) {
+            File file = params[0];
+            String result="";
+            try {
+                HttpResponse<JsonNode> response = Unirest
+                        .post("http://api.idolondemand.com/1/api/sync/ocrdocument/v1")
+                        .field("file",file)
+                        .field("mode", "scene_photo")
+                        .field("apikey","<yourapikey>")
+                        .asJson();
+                JSONObject textblock =(JSONObject) response.getBody().getObject().getJSONArray("text_block").get(0);
+                result=textblock.getString("text");
+            } catch (Exception e) {
+// keeping error handling simple
+                e.printStackTrace();
+            }
+            Log.i("MARTIN"+file.getName(),result);
+            return result;
+        }
+        @Override
+        protected void onPostExecute(String result) {
+// TODO Auto-generated method stub
+            activity.toastResult(result);
+        }
+    }
+
+    public void processPictureWhenReady(Bitmap bm) {
+        Toast.makeText(getApplicationContext(), "FILE IS WRITTEN",
+                Toast.LENGTH_SHORT).show();
+        File dir = Environment
+                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+        Bitmap out = Bitmap.createScaledBitmap(bm, 640, 960, false);
+        File file = new File(dir, "resize.png");
+        FileOutputStream fOut;
+        try {
+            fOut = new FileOutputStream(file);
+            out.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+            fOut.flush();
+            fOut.close();
+            new IODOCRTask(this).execute(file);
+        } catch (Exception e) { // TODO
+            e.printStackTrace();
+        }
     }
 
     class UpdateBeacon extends TimerTask {
@@ -392,8 +484,8 @@ public class ShopActivity extends Activity {
                             }
                         }
                     }
-                    TextView rView = (TextView)findViewById(R.id.near);
-                    TextView rssiView = (TextView)findViewById(R.id.rssiLabel);
+                    TextView rView = (TextView) findViewById(R.id.near);
+                    TextView rssiView = (TextView) findViewById(R.id.rssiLabel);
                     if (notZero) {
                         if (visited.size() < 3) {
                             currProximity(beacons);
