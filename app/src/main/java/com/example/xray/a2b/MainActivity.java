@@ -41,17 +41,14 @@ public class MainActivity extends Activity{
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        ArrayList<String> shop_list = data.getStringArrayListExtra("SHOP_LIST");
-        TextView rssiView = (TextView)findViewById(R.id.rssiLabel);
-        rssiView.setText("ENTERED" );
+
         // Check which request we're responding to
         if (requestCode == 1) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                rssiView.setText("SHOP_LEN: " + shop_list.size());
                 // The user picked a contact.
                 // The Intent's data Uri identifies which contact was selected.
-
+                shop_list = data.getStringArrayListExtra("SHOP_LIST");
                 // Do something with the contact here (bigger example below)
             }
         }

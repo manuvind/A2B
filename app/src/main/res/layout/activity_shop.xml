@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:fbutton="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -9,51 +10,83 @@
     tools:context=".MainActivity">
 
     <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:id="@+id/shopList"
-        android:layout_below="@+id/button2" />
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/rssiLabel" />
 
     <TextView
         android:id="@+id/rssiLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="14dp"
         android:gravity="center"
-        android:text="RSSI Label" />
+        android:text="RSSI Label"
+        android:layout_above="@+id/textView"
+        android:layout_alignParentLeft="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Text"
         android:id="@+id/textView"
-        android:layout_below="@+id/rssiLabel"
-        android:layout_alignStart="@+id/rssiLabel" />
+        android:layout_alignStart="@+id/rssiLabel"
+        android:layout_above="@+id/near"
+        android:layout_alignParentLeft="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Text"
         android:id="@+id/near"
-        android:layout_below="@+id/textView"
-        android:layout_alignStart="@+id/textView" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:paddingLeft="0dp" />
 
-    <Button
+    <!--<info.hoang8f.widget.FButton-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Reset"-->
+        <!--android:id="@+id/button"-->
+        <!--android:onClick="resetBeacons"-->
+        <!--fbutton:buttonColor="@color/color_concrete"-->
+        <!--fbutton:shadowColor="@color/color_asbestos"-->
+        <!--fbutton:shadowEnabled="true"-->
+        <!--fbutton:shadowHeight="5dp"-->
+        <!--fbutton:cornerRadius="5dp"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_toEndOf="@+id/button2" />-->
+
+    <info.hoang8f.widget.FButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Reset"
-        android:id="@+id/button"
-        android:onClick="resetBeacons"
-        android:layout_below="@+id/near"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Button"
+        android:text="Set Watch"
+        fbutton:buttonColor="@color/color_concrete"
+        fbutton:shadowColor="@color/color_asbestos"
+        fbutton:shadowEnabled="true"
+        fbutton:shadowHeight="5dp"
+        fbutton:cornerRadius="5dp"
         android:id="@+id/button2"
         android:onClick="installToq"
-        android:layout_below="@+id/button"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@+id/shopList"
+        android:layout_toEndOf="@+id/rssiLabel"
+        android:layout_alignParentBottom="true"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp" />
 
+    <!--<ImageView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/imageView"-->
+        <!--android:layout_below="@+id/shopList"-->
+        <!--android:layout_alignRight="@+id/button2"-->
+        <!--android:layout_alignParentStart="true" />-->
+
+    <!--<EditText-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/editText"        -->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_marginLeft="151dp" />-->
+    <!--android:layout_below="@+id/button"-->
 </RelativeLayout>

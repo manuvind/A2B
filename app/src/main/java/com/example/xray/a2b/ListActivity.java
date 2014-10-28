@@ -22,7 +22,8 @@ import java.util.List;
 public class ListActivity extends Activity {
     public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
     ArrayList<String> list = new ArrayList<String>();
-    ArrayAdapter adapter;
+    MyAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +34,9 @@ public class ListActivity extends Activity {
         list = intent.getStringArrayListExtra(MainActivity.EXTRA_MESSAGE);
 
         final ListView listview = (ListView) findViewById(R.id.listview);
-        adapter = new ArrayAdapter(this,
-                android.R.layout.simple_list_item_1, list);
+        adapter = new MyAdapter(this,list);
+//        adapter = new MyAdapter(this,
+//                android.R.layout.simple_list_item_1, list);
 
         listview.setAdapter(adapter);
         final EditText edittext = (EditText) findViewById(R.id.addItem);
@@ -42,8 +44,9 @@ public class ListActivity extends Activity {
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
                 // If the event is a key-down event on the "enter" button
-                if ((keyEvent.getAction() == KeyEvent.ACTION_DOWN) &&
-                        (i== KeyEvent.KEYCODE_ENTER)) {
+                if (((keyEvent.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (i== KeyEvent.KEYCODE_ENTER))
+                       ) {
                     list.add(edittext.getText().toString());
                     adapter.notifyDataSetChanged();
                     edittext.setText("");
@@ -83,30 +86,6 @@ public class ListActivity extends Activity {
         finish();
     }
 
-    private class StableArrayAdapter extends ArrayAdapter<String> {
-
-        HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
-
-        public StableArrayAdapter(Context context, int textViewResourceId,
-                                  List<String> objects) {
-            super(context, textViewResourceId, objects);
-            for (int i = 0; i < objects.size(); ++i) {
-                mIdMap.put(objects.get(i), i);
-            }
-        }
-
-        @Override
-        public long getItemId(int position) {
-            String item = getItem(position);
-            return mIdMap.get(item);
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return true;
-        }
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
